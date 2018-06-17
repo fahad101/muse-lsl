@@ -5,30 +5,48 @@ from shutil import copyfile
 import os
 import platform
 import subprocess
+import tempfile
+import zipfile
+import wget
+import logging 
 
 class PostDevelopCommand(develop):
     """Post-installation for development mode."""
     def run(self):
-        if(check_install_bluemuse(True)): install_bluemuse()
         develop.run(self)
+        if(check_install_bluemuse(True)): install_bluemuse()
 
 class PostInstallCommand(install):
     """Post-installation for installation mode."""
     def run(self):
-        if(check_install_bluemuse()): install_bluemuse()
         install.run(self)
+        if(check_install_bluemuse()): install_bluemuse()
 
 def install_bluemuse():
-    powerShellPath = r'C:\WINDOWS\system32\WindowsPowerShell\v1.0\powershell.exe'
-    remove = "./bluemuse_dist/Remove-AppOldPackage.ps1"
-    install = './bluemuse_dist/Add-AppDevPackage.ps1'
-    subprocess.call([powerShellPath, '-ExecutionPolicy', 'Unrestricted', remove])
-    subprocess.call([powerShellPath, '-ExecutionPolicy', 'Unrestricted', install])
+    zipfile_name = 'BlueMuse_1.0.7.0.zip'
+    url = 'https://github.com/kowalej/BlueMuse/raw/master/Dist/' + zipfile_name
+    dist_folder = 'temp_bluemuse_dist'
+
+    tmp_dir = tempfile.mkdtemp(dist_folder) or dist_folder
+
+    print('Downloading BlueMuse to: ' + tmp_dir)
+    zipfile_path = os.path.join(tmp_dir, zipfile_name)
+    wget.download(url, zipfile_path)
+
+    print('Extracting: ' + zipfile_path)
+    zip_ref = zipfile.ZipFile(zipfile_path, 'r')
+    zip_ref.extractall(tmp_dir)
+    zip_ref.close()
+
+    extract_dir = zipfile_path.replace('.zip','')
+    powershell_path = r'C:\WINDOWS\system32\WindowsPowerShell\v1.0\powershell.exe'
+    install_script = os.path.join(extract_dir, 'InstallBlueMuse.ps1')
+    subprocess.call([powershell_path, '-ExecutionPolicy', 'Unrestricted', install_script])
 
 def check_install_bluemuse(ask_user = False):
-    platformName = platform.system().lower()
-    if platformName == 'windows' and int(platform.version().replace('.', '')) >= 10015063:
-        if d: return True
+    platform_name = platform.system().lower()
+    if platform_name == 'windows' and int(platform.version().replace('.', '')) >= 10015063:
+        if ask_user: return True
         print('-------------------- ATTENTION ----------------------------\nWe have detected you are on a compatible Windows 10 system.')
         while(True):
             try:
@@ -69,7 +87,7 @@ setup(name='muselsl',
         'install': PostInstallCommand
       },
       packages=find_packages(),
-      package_data={'': ['bluemuse_dist/*'], 'muselsl': ['docs/*']},
+      package_data={'muselsl': ['docs/*']},
       include_package_data=True,
       zip_safe=False,
       install_requires=['bitstring', 'pylsl', 'pygatt==3.1.1',
