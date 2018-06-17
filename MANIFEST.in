@@ -1,3 +1,4 @@
 include LICENSE.txt
 include README.md
 include blinks.png
+recursive-include bluemuse_dist *
