@@ -32,15 +32,15 @@ def list_muses(backend='auto', interface=None):
 
     if(muses):
         for muse in muses:
-            print('Found device %s, MAC Address %s' %
-                  (muse['name'], muse['address']))
+            print('Found device %s, MAC Address %s' % (muse['name'], muse['address']))
     else:
         print('No Muses found.')
 
     return muses
 
 
-# Returns the address of the Muse with the name provided, otherwise returns address of first available Muse.
+# Returns the address of the Muse with the name provided, otherwise returns
+# address of first available Muse.
 def find_muse(name=None):
     muses = list_muses()
     if name:
@@ -52,7 +52,7 @@ def find_muse(name=None):
 
 
 # Begins an LSL stream containing EEG data from a Muse with a given address
-def stream(address, backend='auto', interface=None, name=None):
+def stream(address, backend='auto', interface=None, name=None, unmanaged=False):
     bluemuse = backend == 'bluemuse'
     if not bluemuse:
         if not address:
@@ -63,37 +63,41 @@ def stream(address, backend='auto', interface=None, name=None):
                 address = found_muse['address']
                 name = found_muse['name']
 
-    info = StreamInfo('Muse', 'EEG', MUSE_NB_CHANNELS, MUSE_SAMPLING_RATE, 'float32',
-                      'Muse%s' % address)
+        info = StreamInfo('Muse', 'EEG', MUSE_NB_CHANNELS, MUSE_SAMPLING_RATE, 'float32',
+                          'Muse%s' % address)
 
-    info.desc().append_child_value("manufacturer", "Muse")
-    channels = info.desc().append_child("channels")
+        info.desc().append_child_value("manufacturer", "Muse")
+        channels = info.desc().append_child("channels")
 
-    for c in ['TP9', 'AF7', 'AF8', 'TP10', 'Right AUX']:
-        channels.append_child("channel") \
-            .append_child_value("label", c) \
-            .append_child_value("unit", "microvolts") \
-            .append_child_value("type", "EEG")
+        for c in ['TP9', 'AF7', 'AF8', 'TP10', 'Right AUX']:
+            channels.append_child("channel") \
+                .append_child_value("label", c) \
+                .append_child_value("unit", "microvolts") \
+                .append_child_value("type", "EEG")
 
-    outlet = StreamOutlet(info, LSL_CHUNK)
+        outlet = StreamOutlet(info, LSL_CHUNK)
 
-    def push_eeg(data, timestamps):
-        for ii in range(LSL_CHUNK):
-            outlet.push_sample(data[:, ii], timestamps[ii])
+        def push_eeg(data, timestamps):
+            for ii in range(LSL_CHUNK):
+                outlet.push_sample(data[:, ii], timestamps[ii])
 
-    muse = Muse(address=address, callback_eeg=push_eeg,
-                backend=backend, interface=interface, name=name)
+        muse = Muse(address=address, callback_eeg=push_eeg,
+                    backend=backend, interface=interface, name=name)
+
+    # Barebones version for BlueMuse.
+    else:
+        muse = Muse(address=address, callback_eeg=None,
+                    backend=backend, interface=interface, name=name)
 
     if(bluemuse):
         muse.connect()
         if not address and not name:
             print('Targeting first device BlueMuse discovers...')
         else:
-            print('Targeting device: ' +
-                  ':'.join(filter(None, [name, address])) + '...')
+            print('Targeting device: ' + ':'.join(filter(None, [name, address])) + '...')
         print('\n*BlueMuse will auto connect and stream when the device is found. \n*You can also use the BlueMuse interface to manage your stream(s).')
         muse.start()
-        return
+        return muse # BlueMuse can always just return muse object.
 
     didConnect = muse.connect()
 
@@ -101,7 +105,9 @@ def stream(address, backend='auto', interface=None, name=None):
         print('Connected.')
         muse.start()
         print('Streaming...')
-
+        if(unmanaged):
+            return muse
+        
         while time() - muse.last_timestamp < AUTO_DISCONNECT_DELAY:
             try:
                 sleep(1)
