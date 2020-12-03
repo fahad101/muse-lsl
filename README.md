@@ -1,5 +1,8 @@
 # Muse LSL
 
+Lab weblink:
+https://www.krigolsonlab.com/working-with-muse.html 
+
 A Python package for streaming, visualizing, and recording EEG data from the Muse 2016 headband.
 
 ![Blinks](blinks.png)
