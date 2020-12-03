@@ -3,6 +3,10 @@
 Lab weblink:
 https://www.krigolsonlab.com/working-with-muse.html 
 
+https://m.youtube.com/watch?v=OX-4rpCegjk
+Preview YouTube video Muse Monitor (The Best 3rd Party Brainwave Recording App)
+Pinpoints usefulness of Muse to Experiments in Psychology.
+
 A Python package for streaming, visualizing, and recording EEG data from the Muse 2016 headband.
 
 ![Blinks](blinks.png)
