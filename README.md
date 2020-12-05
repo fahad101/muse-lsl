@@ -3,6 +3,9 @@
 Lab weblink:
 https://www.krigolsonlab.com/working-with-muse.html 
 
+Using Muse with EEGLab in Matlab:
+https://www.youtube.com/watch?v=YUJ2fax2Sno
+
 https://m.youtube.com/watch?v=OX-4rpCegjk
 Preview YouTube video Muse Monitor (The Best 3rd Party Brainwave Recording App)
 Pinpoints usefulness of Muse to Experiments in Psychology.
