@@ -10,6 +10,10 @@ https://m.youtube.com/watch?v=OX-4rpCegjk
 Preview YouTube video Muse Monitor (The Best 3rd Party Brainwave Recording App)
 Pinpoints usefulness of Muse to Experiments in Psychology.
 
+https://dsp.stackexchange.com/questions/41135/what-does-epoch-mean-in-eeg#:~:text=order%20by,event%20e.g.%20a%20visual%20stimulus.
+"EEG epoching is a procedure in which specific time-windows are extracted from the continuous EEG signal. These time windows are called “epochs”, and usually are time-locked with respect an event e.g. a visual stimulus. If your EEG data are in a matrix [channel x time] where time is the complete continuous EEG signal, after the epoching procedure you should have a matrix [channel x time x epochs] where time is the time length of each epoch, and epochs is the number of segments you extracted from continuous EEG signal.
+Finally, if you want to extract epochs from your signal, you should know what are the segments of interest to be analyzed, for instance, a specific stimulus."
+
 A Python package for streaming, visualizing, and recording EEG data from the Muse 2016 headband.
 
 ![Blinks](blinks.png)
